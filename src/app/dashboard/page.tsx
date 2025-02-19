@@ -5,7 +5,6 @@ import { permanentRedirect } from "next/navigation";
 import { useUser } from "@auth0/nextjs-auth0";
 import { useState } from "react";
 
-import { Underline } from "@/components/Underline";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -27,6 +26,12 @@ import {
 import { Separator } from "@/components/ui/separator";
 import Icons from "@/components/Icons";
 import { Button } from "@/components/ui/button";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 export default function Dashboard() {
   const meetingModesOption = [
@@ -113,17 +118,36 @@ export default function Dashboard() {
               <p className="-mt-[2px] text-foreground">使用會議軟體錄製</p>
             </Button>
           </div>
-          <div className="bg-foreground rounded-md mt-4 flex items-center gap-2 px-5 py-4">
-            <p className="text-white cursor-pointer">
-              <Underline lineColor="bg-white">展開紀錄</Underline>
-            </p>
-            <div className="flex-grow" />
-            <div>
-              <input
-                type="text"
-                placeholder="搜索會議..."
-                className="bg-black text-white rounded-sm px-2 py-1 text-sm"
-              />
+          <div className="flex flex-col bg-foreground rounded-md mt-4 gap-2 px-5 py-4 pb-5">
+            <Accordion type="single" collapsible className="text-white w-full">
+              <AccordionItem value="meetings">
+                <AccordionTrigger className="pt-0 pb-2">
+                  展開紀錄
+                </AccordionTrigger>
+                <AccordionContent />
+                <AccordionContent>自訂會議名稱</AccordionContent>
+                <AccordionContent>自訂會議名稱</AccordionContent>
+                <AccordionContent>自訂會議名稱</AccordionContent>
+                <AccordionContent>自訂會議名稱</AccordionContent>
+              </AccordionItem>
+            </Accordion>
+            <div className="mt-3 flex items-center gap-2 rounded-lg bg-white bg-opacity-10 px-3 py-2 w-full">
+              <Avatar className="border border-foreground h-8 w-auto">
+                <AvatarImage src={user.picture} />
+                <AvatarFallback
+                  className={
+                    (user.given_name?.length || 0) > 2 ? "text-xs" : "text-sm"
+                  }
+                >
+                  {user.nickname}
+                </AvatarFallback>
+              </Avatar>
+              <p className="flex-grow text-left font-semibold text-white text-ellipsis overflow-hidden whitespace-nowrap">
+                {`${user.given_name} ${user.family_name}`}
+              </p>
+              <Badge className="bg-background text-foreground pointer-events-none">
+                {isPro ? "Pro" : "Free"}
+              </Badge>
             </div>
           </div>
         </div>
