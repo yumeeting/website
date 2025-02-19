@@ -38,11 +38,11 @@ export default async function Login() {
             我們致力於讓會議記錄變得簡單、快捷，讓每個人都能專注於真正重要的事情，提升會議的價值和效率。
           </p>
           <a
-            href="/auth/login"
+            href={session ? "/dashboard" : "/auth/login"}
             className="flex items-center justify-center mt-12 w-full h-12 rounded-full border-2 border-black text-neutral-800 bg-stone-200 hover:bg-stone-300 transition-colors duration-300"
           >
             {session
-              ? `Start as ${session.user.name}`
+              ? `Start as ${session.user.given_name} ${session.user.family_name}`
               : "Login to use YU Meeting"}
           </a>
         </div>
