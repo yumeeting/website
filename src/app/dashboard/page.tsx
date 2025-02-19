@@ -1,9 +1,11 @@
-import { LogOut, Mic, Plus, Sparkle, User } from "lucide-react";
-import { permanentRedirect } from "next/navigation";
+"use client";
+
+import { Frown, LogOut, Mic, Plus, Sparkle, User } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { permanentRedirect } from "next/navigation";
+import { useUser } from "@auth0/nextjs-auth0";
 
-import { auth0 } from "@/lib/auth0";
 import { Underline } from "@/components/Underline";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -15,12 +17,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Spinner } from "@/components/Spinner";
+import { useState } from "react";
 
-export default async function Dashboard() {
-  const session = await auth0.getSession();
-  const isPro = false;
+export default function Dashboard() {
+  const { user, isLoading } = useUser();
 
-  if (!session) {
+  const [isPro, setIsPro] = useState(false);
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col flex-wrap justify-center items-center min-h-dvh">
+        <Spinner size="large" show={true} />
+        <p className="mt-4">Loading YU Meeting Dashboard ...</p>
+      </div>
+    );
+  } else if (!user) {
     permanentRedirect("/login");
   }
 
@@ -45,19 +57,17 @@ export default async function Dashboard() {
       <DropdownMenu>
         <DropdownMenuTrigger className="fixed top-3 right-4 flex items-center gap-2 rounded-lg border border-stone-300 bg-background px-3 py-2 max-w-56 min-w-48">
           <Avatar className="border border-foreground h-8 w-auto">
-            <AvatarImage src={session.user.picture} />
+            <AvatarImage src={user.picture} />
             <AvatarFallback
               className={
-                (session.user.given_name?.length || 0) > 2
-                  ? "text-xs"
-                  : "text-sm"
+                (user.given_name?.length || 0) > 2 ? "text-xs" : "text-sm"
               }
             >
-              {session.user.given_name}
+              {user.nickname}
             </AvatarFallback>
           </Avatar>
           <p className="flex-grow text-left font-semibold text-ellipsis overflow-hidden whitespace-nowrap">
-            {`${session.user.given_name} ${session.user.family_name}`}
+            {`${user.given_name} ${user.family_name}`}
           </p>
           <Badge className="bg-background text-foreground pointer-events-none">
             {isPro ? "Pro" : "Free"}
@@ -68,11 +78,8 @@ export default async function Dashboard() {
           align="end"
           className="bg-background border-stone-300 dropdown-content-width-full min-w-48"
         >
-          <DropdownMenuLabel
-            //  className="text-ellipsis overflow-hidden whitespace-nowrap"
-            className="overflow-x-auto light-scrollbar"
-          >
-            {session.user.email}
+          <DropdownMenuLabel className="overflow-x-auto light-scrollbar">
+            {user.email}
           </DropdownMenuLabel>
           <DropdownMenuSeparator className="bg-stone-300" />
           <DropdownMenuItem className="cursor-pointer">
@@ -80,9 +87,25 @@ export default async function Dashboard() {
             Profile
           </DropdownMenuItem>
           {!isPro && (
-            <DropdownMenuItem className="cursor-pointer">
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => {
+                setIsPro(true);
+              }}
+            >
               <Sparkle />
-              Get Pro
+              Upgrade to Pro
+            </DropdownMenuItem>
+          )}
+          {isPro && (
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => {
+                setIsPro(false);
+              }}
+            >
+              <Frown />
+              Downgrade to Free
             </DropdownMenuItem>
           )}
           <DropdownMenuSeparator className="bg-stone-300" />

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Noto_Sans_TC, Noto_Serif_SC, Outfit } from "next/font/google";
+import { Auth0Provider } from "@auth0/nextjs-auth0";
 
 import "./globals.css";
 
@@ -34,12 +35,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${outfit.variable} ${inter.variable} ${notoSansTC.variable} ${notoSerifSC.variable} antialiased`}
-      >
-        {children}
-      </body>
-    </html>
+    <Auth0Provider>
+      <html lang="en">
+        <body
+          className={`${outfit.variable} ${inter.variable} ${notoSansTC.variable} ${notoSerifSC.variable} antialiased`}
+        >
+          {children}
+        </body>
+      </html>
+    </Auth0Provider>
   );
 }
