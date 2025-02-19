@@ -1,10 +1,11 @@
 "use client";
 
-import { Frown, LogOut, Mic, Plus, Sparkle, User } from "lucide-react";
+import { Frown, LogOut, Mic, Sparkle, Upload, User } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { permanentRedirect } from "next/navigation";
 import { useUser } from "@auth0/nextjs-auth0";
+import { useState } from "react";
 
 import { Underline } from "@/components/Underline";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -18,7 +19,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Spinner } from "@/components/Spinner";
-import { useState } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function Dashboard() {
   const { user, isLoading } = useUser();
@@ -118,37 +125,48 @@ export default function Dashboard() {
         </DropdownMenuContent>
       </DropdownMenu>
       <div className="flex flex-col flex-wrap justify-center items-center min-h-dvh">
-        <div className="w-11/12 max-w-96">
-          <div className="border border-foreground rounded-lg p-6 bg-gray-100">
+        <div className="w-11/12 max-w-md">
+          <div className="rounded-lg p-5 bg-white">
             <div>
               <p className="text-lg font-bold font-outfit">YU Meeting</p>
               <p className="text-xs font-inter mt-2">
-                {"copyright © "}
-                <a
-                  href="https://yuniverses.com"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  <span className="font-bold">
-                    <Underline>YUNIVER</Underline>
-                  </span>
-                </a>
-                {` ® ${new Date().getFullYear()}`}
+                {"By proceeding, you agree to our "}
+                <span className="font-semibold underline">Terms of Use</span>
+                {"."}
               </p>
             </div>
-            <div className="flex gap-3 mt-6 w-full h-12">
-              <button
-                type="button"
-                className="flex-grow flex items-center justify-center rounded-full border-2 border-black text-neutral-800 bg-stone-50 hover:bg-stone-200 transition-colors duration-300"
-              >
-                <Mic />
-              </button>
-              <button
-                type="button"
-                className="flex items-center justify-center rounded-full hover:bg-stone-200 transition-colors duration-300 aspect-square"
-              >
-                <Plus className="h-3/5 w-auto" />
-              </button>
+            <div className="flex sm:flex-row flex-col gap-3 mt-4 w-full">
+              <div className="flex-grow flex gap-3 h-12">
+                <button
+                  type="button"
+                  className="flex-grow flex items-center justify-center h-full rounded-full text-background bg-foreground hover:bg-stone-700 transition-colors duration-300"
+                >
+                  <Mic />
+                </button>
+                <button
+                  type="button"
+                  className="flex items-center justify-center aspect-square h-full rounded-full border border-foreground hover:bg-stone-200 transition-colors duration-300"
+                >
+                  <Upload className="h-5 w-auto" />
+                </button>
+              </div>
+              <Select>
+                <SelectTrigger className="sm:w-52 w-full h-12 bg-stone-100">
+                  <div>
+                    <p className="text-xs text-left text-stone-500">模式</p>
+                    <SelectValue placeholder="一般會議記錄" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="0">一般會議記錄</SelectItem>
+                  <SelectItem value="1">一般會議記錄（非常詳細）</SelectItem>
+                  <SelectItem value="2">上課內容記錄</SelectItem>
+                  <SelectItem value="3">上課內容記錄（非常詳細）</SelectItem>
+                  <SelectItem value="4">專案會議記錄</SelectItem>
+                  <SelectItem value="5">通話記錄</SelectItem>
+                  <SelectItem value="6">合約會議記錄</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <div className="bg-foreground h-11 rounded-md mt-4 flex items-center gap-2 px-7">
