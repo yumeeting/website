@@ -8,10 +8,20 @@ const iconData: Record<string, { src: string; alt: string; isSvg: boolean }> = {
     alt: "Google Meet Icon",
     isSvg: true,
   },
+  "yu-credit-dark": {
+    src: "/icons/yu-credit-dark.svg",
+    alt: "Yu Credit Icon",
+    isSvg: true,
+  },
+  "yu-credit-light": {
+    src: "/icons/yu-credit-light.svg",
+    alt: "Yu Credit Icon",
+    isSvg: true,
+  },
 };
 
 interface IconsProps {
-  type: "discord" | "google-meet";
+  type: "discord" | "google-meet" | "yu-credit-dark" | "yu-credit-light";
   className?: string;
 }
 
