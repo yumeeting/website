@@ -1,10 +1,9 @@
 "use client";
 
-import { Dot, Ellipsis, Mic, Upload } from "lucide-react";
+import { MicIcon, UploadIcon, DotIcon, EllipsisIcon } from "lucide-react";
 import { permanentRedirect } from "next/navigation";
 import { useUser } from "@auth0/nextjs-auth0";
 import { Dispatch, SetStateAction, useState } from "react";
-import { User } from "@auth0/nextjs-auth0/types";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Spinner } from "@/components/Spinner";
@@ -38,6 +37,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { readableTime } from "@/modules/readableTime";
+import { User } from "@auth0/nextjs-auth0/types";
+import { cn } from "@/lib/utils";
 
 type Meeting = {
   id: number;
@@ -95,8 +96,10 @@ export default function Dashboard() {
 
   return (
     <div className="flex flex-col flex-wrap justify-center items-center min-h-dvh">
-      <div className="w-11/12 max-w-md">
-        <div className="rounded-lg p-5 bg-white">
+      <div className="h-20 sm:h-0" />
+      <div className="w-full px-2 sm:w-11/12 max-w-lg">
+        <Settings user={user} isPro={isPro} setIsPro={setIsPro} />
+        <div className="rounded-lg p-3 sm:p-5 bg-white">
           <div>
             <p className="text-lg font-bold font-outfit">YU Meeting</p>
             <p className="text-xs font-inter mt-2">
@@ -111,13 +114,13 @@ export default function Dashboard() {
                 type="button"
                 className="flex-grow flex items-center justify-center h-full rounded-full text-background bg-foreground hover:bg-stone-700 transition-colors duration-300"
               >
-                <Mic />
+                <MicIcon />
               </button>
               <button
                 type="button"
                 className="flex items-center justify-center aspect-square h-full rounded-full border border-foreground hover:bg-stone-200 transition-colors duration-300"
               >
-                <Upload className="h-5 w-auto" />
+                <UploadIcon className="h-5 w-auto" />
               </button>
             </div>
             <Select>
@@ -150,11 +153,11 @@ export default function Dashboard() {
             <p className="-mt-[2px] text-foreground">使用會議軟體錄製</p>
           </Button>
         </div>
-        <div className="flex flex-col bg-foreground rounded-md mt-4 gap-2 px-5 py-4 pb-5">
+        <div className="flex flex-col bg-foreground rounded-md mt-4 gap-2 px-3 sm:px-5 py-3 sm:py-4">
           <MeetingsList meetings={meetings} setMeetings={setMeetings} />
-          <Settings user={user} isPro={isPro} setIsPro={setIsPro} />
         </div>
       </div>
+      <div className="h-2 sm:h-0" />
     </div>
   );
 }
@@ -165,34 +168,38 @@ function MeetingsList({
 }: { meetings: Meeting[]; setMeetings: Dispatch<SetStateAction<Meeting[]>> }) {
   return (
     <Accordion type="single" collapsible className="text-white w-full">
-      <AccordionItem value="meetings">
-        <AccordionTrigger className="pt-0 pb-2">展開會議紀錄</AccordionTrigger>
-        <AccordionContent />
+      <AccordionItem
+        value="meetings"
+        className="border-b-0 flex flex-col gap-2"
+      >
+        <AccordionTrigger className="p-0">展開會議紀錄</AccordionTrigger>
+        <AccordionContent className="p-0" />
         {meetings.map((meeting) => (
-          <AccordionContent key={meeting.id}>
-            <div className="flex items-center justify-between gap-4 hover:bg-[#383838] transition-colors duration-200 cursor-pointer px-2 py-1 rounded-lg">
-              <div>
-                <p className="flex items-center text-xs text-muted-foreground">
-                  {readableTime.formatElapsedTime(meeting.durationMs).string}
-                  <Dot className="-mx-1.5" />
-                  {new Date(meeting.createdAt).toLocaleDateString()}
-                </p>
-                <p className="text-lg">{meeting.title}</p>
-              </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger className="px-1.5 aspect-square rounded-xl hover:bg-foreground transition-colors duration-200">
-                  <Ellipsis />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="bg-[#383838] border-none text-white">
-                  <DropdownMenuItem className="cursor-pointer">
-                    Delete
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer">
-                    Rename
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+          <AccordionContent
+            key={meeting.id}
+            className="flex items-center justify-between gap-4 hover:bg-[#383838] transition-colors duration-200 cursor-pointer px-2 pb-1.5 rounded-lg"
+          >
+            <div>
+              <p className="flex items-center text-xs text-muted-foreground">
+                {readableTime.formatElapsedTime(meeting.durationMs).string}
+                <DotIcon className="-mx-1.5" />
+                {new Date(meeting.createdAt).toLocaleDateString()}
+              </p>
+              <p className="text-base sm:text-lg">{meeting.title}</p>
             </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="-mb-1.5 px-1.5 aspect-square rounded-xl hover:bg-foreground transition-colors duration-200">
+                <EllipsisIcon />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-[#383838] border-none text-white">
+                <DropdownMenuItem className="cursor-pointer">
+                  Delete
+                </DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer">
+                  Rename
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </AccordionContent>
         ))}
       </AccordionItem>
@@ -211,18 +218,18 @@ function Settings({
 }) {
   return (
     <Dialog>
-      <DialogTrigger className="mt-3 flex items-center gap-2 rounded-lg bg-white bg-opacity-10 px-3 py-2 w-full">
-        <Avatar className="border border-foreground h-8 w-auto">
+      <DialogTrigger className="fixed top-3 right-4 flex items-center gap-2 rounded-lg border border-stone-300 bg-background px-3 py-2">
+        <Avatar className="border border-foreground h-8 w-auto aspect-square">
           <AvatarImage src={user.picture} />
           <AvatarFallback
             className={
               (user.given_name?.length || 0) > 2 ? "text-xs" : "text-sm"
             }
           >
-            {user.nickname}
+            {user.given_name}
           </AvatarFallback>
         </Avatar>
-        <p className="flex-grow text-left font-semibold text-white text-ellipsis overflow-hidden whitespace-nowrap">
+        <p className="hidden sm:block max-w-32 flex-grow text-left font-semibold text-ellipsis overflow-hidden whitespace-nowrap">
           {`${user.given_name} ${user.family_name}`}
         </p>
         <div className="flex items-center gap-3 bg-white px-3 py-1.5 rounded-full">
@@ -230,30 +237,31 @@ function Settings({
           <p className="text-xs">{isPro ? "300 小時" : "300 分鐘"}</p>
         </div>
       </DialogTrigger>
-      <DialogContent className="bg-black border-none text-white !rounded-2xl">
+      <DialogContent className="bg-black border-none text-white !rounded-2xl px-4 sm:px-6 py-4 sm:py-5">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
-            <Avatar className="border border-foreground h-12 w-auto">
+            <Avatar className="border border-foreground h-12 w-auto aspect-square">
               <AvatarImage src={user.picture} />
               <AvatarFallback
-                className={
-                  (user.given_name?.length || 0) > 2 ? "text-xs" : "text-sm"
-                }
+                className={cn(
+                  "bg-stone-700",
+                  (user.given_name?.length || 0) > 2 ? "text-xs" : "text-sm",
+                )}
               >
-                {user.nickname}
+                {user.given_name}
               </AvatarFallback>
             </Avatar>
             <div className="flex-grow flex flex-col gap-1 h-full py-1">
               <p className="text-left font-semibold text-white text-ellipsis overflow-hidden whitespace-nowrap">
                 {`${user.given_name} ${user.family_name}`}
               </p>
-              <p className="text-muted-foreground text-xs text-ellipsis overflow-hidden whitespace-nowrap">
+              <p className="text-left text-muted-foreground text-xs text-ellipsis overflow-hidden whitespace-nowrap">
                 {user.email}
               </p>
             </div>
           </DialogTitle>
         </DialogHeader>
-        <div className="bg-foreground rounded-2xl px-5 py-4">
+        <div className="bg-foreground rounded-2xl px-3 sm:px-5 py-3 sm:py-4">
           <p>當前：{isPro ? "高級方案" : "免費方案"}</p>
           <div className="flex items-center justify-between mt-3 mx-2">
             <p className="flex items-center gap-2">
@@ -272,11 +280,11 @@ function Settings({
             onClick={() => {
               setIsPro(!isPro);
             }}
-            className="rounded-2xl mt-4 bg-[#076AFF] hover:bg-[#065ad8] w-full px-4 py-3 text-lg h-fit"
+            className="rounded-xl mt-4 bg-[#076AFF] hover:bg-[#065ad8] w-full px-3 sm:px-4 py-2 sm:py-3 text-base sm:text-lg h-fit"
           >
             {isPro ? "降級至免費方案" : "升級至高級方案"}
           </Button>
-          <Button className="rounded-2xl mt-2 bg-[#076aff27] hover:bg-[#065ad827] text-[#076AFF] w-full px-4 py-3 text-lg h-fit">
+          <Button className="rounded-xl mt-3 bg-[#076aff27] hover:bg-[#065ad827] text-[#076AFF] w-full px-3 sm:px-4 py-2 sm:py-3 text-base sm:text-lg h-fit">
             檢視方案 / 購買更多時數
           </Button>
         </div>
