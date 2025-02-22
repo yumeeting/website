@@ -92,8 +92,12 @@ export default function Dashboard() {
     <>
       <div className="flex flex-col flex-wrap justify-center items-center min-h-dvh">
         <div className="h-20 sm:h-0" />
-        <div className="h-[60dvh] flex gap-4 items-center justify-center w-full transition-[height] duration-500">
-          <div />
+        <div
+          className={cn(
+            "w-full h-[85dvh] px-6 flex items-center gap-0 justify-center transition-[height,gap] duration-500",
+            selectedRecordingId && "gap-4",
+          )}
+        >
           <div className="h-full flex flex-col justify-center gap-4 sm:w-11/12 max-w-md">
             <RecordPanel
               recordingsModeSelection={recordingsModeSelection}
@@ -205,9 +209,9 @@ function RecordingContent({
     <>
       <div
         className={cn(
-          "h-full max-w-3xl flex items-center justify-center bg-white rounded-lg transition-[width,height,margin] duration-300 overflow-hidden",
+          "h-full max-w-7xl flex items-center justify-center bg-white rounded-lg transition-[width,height,margin] duration-300 overflow-hidden",
           !selectedRecordingId && "w-0 h-0 mt-60",
-          selectedRecordingId && "w-full h-full mr-4",
+          selectedRecordingId && "w-full h-full",
         )}
       >
         <motion.div
@@ -316,7 +320,7 @@ function RecordingsList({
                     <DropdownMenuTrigger className="-mb-1.5 px-1.5 aspect-square rounded-xl hover:bg-foreground transition-colors duration-200">
                       <EllipsisIcon />
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent className="bg-[#383838] border-none text-white">
+                    <DropdownMenuContent className="bg-[#383838] border border-foreground text-white">
                       <DropdownMenuItem className="cursor-pointer">
                         Delete
                       </DropdownMenuItem>
