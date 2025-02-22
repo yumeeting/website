@@ -95,70 +95,72 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="flex flex-col flex-wrap justify-center items-center min-h-dvh">
-      <div className="h-20 sm:h-0" />
-      <div className="w-full px-2 sm:w-11/12 max-w-lg">
-        <Settings user={user} isPro={isPro} setIsPro={setIsPro} />
-        <div className="rounded-lg p-3 sm:p-5 bg-white">
-          <div>
-            <p className="text-lg font-bold font-outfit">YU Meeting</p>
-            <p className="text-xs font-inter mt-2">
-              {"By proceeding, you agree to our "}
-              <span className="font-semibold underline">Terms of Use</span>
-              {"."}
-            </p>
-          </div>
-          <div className="flex sm:flex-row flex-col gap-3 mt-4 w-full">
-            <div className="flex-grow flex gap-3 h-12">
-              <button
-                type="button"
-                className="flex-grow flex items-center justify-center h-full rounded-full text-background bg-foreground hover:bg-stone-700 transition-colors duration-300"
-              >
-                <MicIcon />
-              </button>
-              <button
-                type="button"
-                className="flex items-center justify-center aspect-square h-full rounded-full border border-foreground hover:bg-stone-200 transition-colors duration-300"
-              >
-                <UploadIcon className="h-5 w-auto" />
-              </button>
+    <>
+      <div className="flex flex-col flex-wrap justify-center items-center min-h-dvh">
+        <div className="h-20 sm:h-0" />
+        <div className="w-full px-2 sm:w-11/12 max-w-lg">
+          <div className="rounded-lg p-3 sm:p-5 bg-white">
+            <div>
+              <p className="text-lg font-bold font-outfit">YU Meeting</p>
+              <p className="text-xs font-inter mt-2">
+                {"By proceeding, you agree to our "}
+                <span className="font-semibold underline">Terms of Use</span>
+                {"."}
+              </p>
             </div>
-            <Select>
-              <SelectTrigger className="sm:w-52 w-full h-12 bg-stone-100">
-                <div>
-                  <p className="text-xs text-left text-stone-500">模式</p>
-                  <SelectValue
-                    placeholder={meetingModesOption[meetingModeSelection]}
-                  />
-                </div>
-              </SelectTrigger>
-              <SelectContent>
-                {meetingModesOption.map((mode, index) => (
-                  <SelectItem
-                    key={index}
-                    value={String(index)}
-                    className="cursor-pointer"
-                    onClick={() => setMeetingModeSelection(index)}
-                  >
-                    {mode}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex sm:flex-row flex-col gap-3 mt-4 w-full">
+              <div className="flex-grow flex gap-3 h-12">
+                <button
+                  type="button"
+                  className="flex-grow flex items-center justify-center h-full rounded-full text-background bg-foreground hover:bg-stone-700 transition-colors duration-300"
+                >
+                  <MicIcon />
+                </button>
+                <button
+                  type="button"
+                  className="flex items-center justify-center aspect-square h-full rounded-full border border-foreground hover:bg-stone-200 transition-colors duration-300"
+                >
+                  <UploadIcon className="h-5 w-auto" />
+                </button>
+              </div>
+              <Select>
+                <SelectTrigger className="sm:w-52 w-full h-12 bg-stone-100">
+                  <div>
+                    <p className="text-xs text-left text-stone-500">模式</p>
+                    <SelectValue
+                      placeholder={meetingModesOption[meetingModeSelection]}
+                    />
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  {meetingModesOption.map((mode, index) => (
+                    <SelectItem
+                      key={index}
+                      value={String(index)}
+                      className="cursor-pointer"
+                      onClick={() => setMeetingModeSelection(index)}
+                    >
+                      {mode}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <Separator className="mt-3" />
+            <Button className="mt-3 h-12 w-full bg-stone-100 hover:bg-stone-200">
+              <Icons type="discord" />
+              <Icons type="google-meet" />
+              <p className="-mt-[2px] text-foreground">使用會議軟體錄製</p>
+            </Button>
           </div>
-          <Separator className="mt-3" />
-          <Button className="mt-3 h-12 w-full bg-stone-100 hover:bg-stone-200">
-            <Icons type="discord" />
-            <Icons type="google-meet" />
-            <p className="-mt-[2px] text-foreground">使用會議軟體錄製</p>
-          </Button>
+          <div className="flex flex-col bg-foreground rounded-md mt-4 gap-2 px-3 sm:px-5 py-3 sm:py-4">
+            <MeetingsList meetings={meetings} setMeetings={setMeetings} />
+          </div>
         </div>
-        <div className="flex flex-col bg-foreground rounded-md mt-4 gap-2 px-3 sm:px-5 py-3 sm:py-4">
-          <MeetingsList meetings={meetings} setMeetings={setMeetings} />
-        </div>
+        <div className="h-2 sm:h-0" />
       </div>
-      <div className="h-2 sm:h-0" />
-    </div>
+      <Settings user={user} isPro={isPro} setIsPro={setIsPro} />
+    </>
   );
 }
 
@@ -218,7 +220,7 @@ function Settings({
 }) {
   return (
     <Dialog>
-      <DialogTrigger className="fixed top-3 right-4 flex items-center gap-2 rounded-lg border border-stone-300 bg-background px-3 py-2">
+      <DialogTrigger className="fixed top-0 right-0 flex items-center gap-2 rounded-bl-3xl border-none bg-white px-3 py-2">
         <Avatar className="border border-foreground h-8 w-auto aspect-square">
           <AvatarImage src={user.picture} />
           <AvatarFallback
@@ -232,7 +234,7 @@ function Settings({
         <p className="hidden sm:block max-w-32 flex-grow text-left font-semibold text-ellipsis overflow-hidden whitespace-nowrap">
           {`${user.given_name} ${user.family_name}`}
         </p>
-        <div className="flex items-center gap-3 bg-white px-3 py-1.5 rounded-full">
+        <div className="flex items-center gap-3 bg-background px-3 py-1.5 rounded-full">
           <Icons type="yu-credit-dark" className="h-4 w-auto" />
           <p className="text-xs">{isPro ? "300 小時" : "300 分鐘"}</p>
         </div>
