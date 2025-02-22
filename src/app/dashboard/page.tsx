@@ -3,7 +3,8 @@
 import { MicIcon, UploadIcon, DotIcon, EllipsisIcon } from "lucide-react";
 import { permanentRedirect } from "next/navigation";
 import { useUser } from "@auth0/nextjs-auth0";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { motion } from "motion/react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Spinner } from "@/components/Spinner";
@@ -37,46 +38,39 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { readableTime } from "@/modules/readableTime";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { User } from "@auth0/nextjs-auth0/types";
 import { cn } from "@/lib/utils";
 
-type Meeting = {
-  id: number;
+type Recordings = {
+  id: string;
   title: string;
   durationMs: number;
   createdAt: number;
 };
 
-const meetingModesOption = [
-  "一般會議記錄",
-  "一般會議記錄（非常詳細）",
-  "上課內容記錄",
-  "上課內容記錄（非常詳細）",
-  "專案會議記錄",
-  "通話記錄",
-  "合約會議記錄",
-];
-
 export default function Dashboard() {
   const { user, isLoading: isAuth0Loading } = useUser();
 
-  const [meetingModeSelection, setMeetingModeSelection] = useState(0);
+  const [recordingsModeSelection, setRecordingsModeSelection] = useState(0);
   const [isPro, setIsPro] = useState(false);
-  const [meetings, setMeetings] = useState<Meeting[]>([
+  const [selectedRecordingId, setSelectedRecordingId] = useState<string>("");
+  const [recordings, setRecordings] = useState<Recordings[]>([
     {
-      id: 1,
+      id: "1",
       title: "關於多語言海報設計的反饋與建議",
       durationMs: Math.floor(Math.random() * (600000 - 10000 + 1)) + 10000,
       createdAt: Date.now(),
     },
     {
-      id: 2,
+      id: "2",
       title: "增強品牌與產品案例展示及其他項目討論",
       durationMs: Math.floor(Math.random() * (600000 - 10000 + 1)) + 10000,
       createdAt: Date.now() - Math.floor(Math.random() * 11) * 86400000,
     },
     {
-      id: 3,
+      id: "3",
       title: "顧客與店員關於商品維修的詳細對話",
       durationMs: Math.floor(Math.random() * (600000 - 10000 + 1)) + 10000,
       createdAt: Date.now() - Math.floor(Math.random() * 11) * 86400000,
@@ -98,64 +92,25 @@ export default function Dashboard() {
     <>
       <div className="flex flex-col flex-wrap justify-center items-center min-h-dvh">
         <div className="h-20 sm:h-0" />
-        <div className="w-full px-2 sm:w-11/12 max-w-lg">
-          <div className="rounded-lg p-3 sm:p-5 bg-white">
-            <div>
-              <p className="text-lg font-bold font-outfit">YU Meeting</p>
-              <p className="text-xs font-inter mt-2">
-                {"By proceeding, you agree to our "}
-                <span className="font-semibold underline">Terms of Use</span>
-                {"."}
-              </p>
-            </div>
-            <div className="flex sm:flex-row flex-col gap-3 mt-4 w-full">
-              <div className="flex-grow flex gap-3 h-12">
-                <button
-                  type="button"
-                  className="flex-grow flex items-center justify-center h-full rounded-full text-background bg-foreground hover:bg-stone-700 transition-colors duration-300"
-                >
-                  <MicIcon />
-                </button>
-                <button
-                  type="button"
-                  className="flex items-center justify-center aspect-square h-full rounded-full border border-foreground hover:bg-stone-200 transition-colors duration-300"
-                >
-                  <UploadIcon className="h-5 w-auto" />
-                </button>
-              </div>
-              <Select>
-                <SelectTrigger className="sm:w-52 w-full h-12 bg-stone-100">
-                  <div>
-                    <p className="text-xs text-left text-stone-500">模式</p>
-                    <SelectValue
-                      placeholder={meetingModesOption[meetingModeSelection]}
-                    />
-                  </div>
-                </SelectTrigger>
-                <SelectContent>
-                  {meetingModesOption.map((mode, index) => (
-                    <SelectItem
-                      key={index}
-                      value={String(index)}
-                      className="cursor-pointer"
-                      onClick={() => setMeetingModeSelection(index)}
-                    >
-                      {mode}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <Separator className="mt-3" />
-            <Button className="mt-3 h-12 w-full bg-stone-100 hover:bg-stone-200">
-              <Icons type="discord" />
-              <Icons type="google-meet" />
-              <p className="-mt-[2px] text-foreground">使用會議軟體錄製</p>
-            </Button>
+        <div className="h-[60dvh] flex gap-4 items-center justify-center w-full transition-[height] duration-500">
+          <div />
+          <div className="h-full flex flex-col justify-center gap-4 sm:w-11/12 max-w-md">
+            <RecordPanel
+              recordingsModeSelection={recordingsModeSelection}
+              setRecordingsModeSelection={setRecordingsModeSelection}
+            />
+            <RecordingsList
+              recordings={recordings}
+              setRecordings={setRecordings}
+              handleSelectedRecordingId={(selectedRecordingId) => {
+                setSelectedRecordingId(selectedRecordingId);
+              }}
+            />
           </div>
-          <div className="flex flex-col bg-foreground rounded-md mt-4 gap-2 px-3 sm:px-5 py-3 sm:py-4">
-            <MeetingsList meetings={meetings} setMeetings={setMeetings} />
-          </div>
+          <RecordingContent
+            recordings={recordings}
+            selectedRecordingId={selectedRecordingId}
+          />
         </div>
         <div className="h-2 sm:h-0" />
       </div>
@@ -164,48 +119,219 @@ export default function Dashboard() {
   );
 }
 
-function MeetingsList({
-  meetings,
-  setMeetings: _setMeetings,
-}: { meetings: Meeting[]; setMeetings: Dispatch<SetStateAction<Meeting[]>> }) {
+function RecordPanel({
+  recordingsModeSelection,
+  setRecordingsModeSelection,
+}: {
+  recordingsModeSelection: number;
+  setRecordingsModeSelection: Dispatch<SetStateAction<number>>;
+}) {
+  const recordingsModesOption = [
+    "一般會議記錄",
+    "一般會議記錄（非常詳細）",
+    "上課內容記錄",
+    "上課內容記錄（非常詳細）",
+    "專案會議記錄",
+    "通話記錄",
+    "合約會議記錄",
+  ];
+
   return (
-    <Accordion type="single" collapsible className="text-white w-full">
-      <AccordionItem
-        value="meetings"
-        className="border-b-0 flex flex-col gap-2"
-      >
-        <AccordionTrigger className="p-0">展開會議紀錄</AccordionTrigger>
-        <AccordionContent className="p-0" />
-        {meetings.map((meeting) => (
-          <AccordionContent
-            key={meeting.id}
-            className="flex items-center justify-between gap-4 hover:bg-[#383838] transition-colors duration-200 cursor-pointer px-2 pb-1.5 rounded-lg"
+    <div className="rounded-lg p-3 sm:p-5 bg-white">
+      <div>
+        <p className="text-lg font-bold font-outfit">YU Meeting</p>
+        <p className="text-xs font-inter mt-2">
+          {"By proceeding, you agree to our "}
+          <span className="font-semibold underline">Terms of Use</span>
+          {"."}
+        </p>
+      </div>
+      <div className="flex sm:flex-row flex-col gap-3 mt-4 w-full">
+        <div className="flex-grow flex gap-3 h-12">
+          <button
+            type="button"
+            className="flex-grow flex items-center justify-center h-full rounded-full text-background bg-foreground hover:bg-stone-700 transition-colors duration-300"
           >
+            <MicIcon />
+          </button>
+          <button
+            type="button"
+            className="flex items-center justify-center aspect-square h-full rounded-full border border-foreground hover:bg-stone-200 transition-colors duration-300"
+          >
+            <UploadIcon className="h-5 w-auto" />
+          </button>
+        </div>
+        <Select>
+          <SelectTrigger className="sm:w-52 w-full h-12 bg-stone-100">
             <div>
-              <p className="flex items-center text-xs text-muted-foreground">
-                {readableTime.formatElapsedTime(meeting.durationMs).string}
-                <DotIcon className="-mx-1.5" />
-                {new Date(meeting.createdAt).toLocaleDateString()}
-              </p>
-              <p className="text-base sm:text-lg">{meeting.title}</p>
+              <p className="text-xs text-left text-stone-500">模式</p>
+              <SelectValue
+                placeholder={recordingsModesOption[recordingsModeSelection]}
+              />
             </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger className="-mb-1.5 px-1.5 aspect-square rounded-xl hover:bg-foreground transition-colors duration-200">
-                <EllipsisIcon />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-[#383838] border-none text-white">
-                <DropdownMenuItem className="cursor-pointer">
-                  Delete
-                </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer">
-                  Rename
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </AccordionContent>
-        ))}
-      </AccordionItem>
-    </Accordion>
+          </SelectTrigger>
+          <SelectContent>
+            {recordingsModesOption.map((mode, index) => (
+              <SelectItem
+                key={index}
+                value={String(index)}
+                className="cursor-pointer"
+                onClick={() => setRecordingsModeSelection(index)}
+              >
+                {mode}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      <Separator className="mt-3" />
+      <Button className="mt-3 h-12 w-full bg-stone-100 hover:bg-stone-200">
+        <Icons type="discord" />
+        <Icons type="google-meet" />
+        <p className="-mt-[2px] text-foreground">使用會議軟體錄製</p>
+      </Button>
+    </div>
+  );
+}
+
+function RecordingContent({
+  recordings,
+  selectedRecordingId,
+}: {
+  recordings: Recordings[];
+  selectedRecordingId: string;
+}) {
+  return (
+    <>
+      <div
+        className={cn(
+          "h-full max-w-3xl flex items-center justify-center bg-white rounded-lg transition-[width,height,margin] duration-300 overflow-hidden",
+          !selectedRecordingId && "w-0 h-0 mt-60",
+          selectedRecordingId && "w-full h-full mr-4",
+        )}
+      >
+        <motion.div
+          animate={selectedRecordingId ? "open" : "closed"}
+          variants={{
+            open: {
+              opacity: 1,
+              x: "0%",
+            },
+            closed: {
+              opacity: 1,
+              x: "-100%",
+            },
+          }}
+        >
+          {selectedRecordingId &&
+            recordings.find((recording) => recording.id === selectedRecordingId)
+              ?.title}
+        </motion.div>
+      </div>
+    </>
+  );
+}
+
+function RecordingsList({
+  recordings,
+  setRecordings: _setRecordings,
+  handleListState,
+  handleSelectedRecordingId,
+}: {
+  recordings: Recordings[];
+  setRecordings: Dispatch<SetStateAction<Recordings[]>>;
+  handleListState?: (listOpened: boolean) => void;
+  handleSelectedRecordingId?: (recordingId: string) => void;
+}) {
+  const [selectedRecordingId, setSelectedRecordingId] = useState<string>("");
+  const [listOpened, setListOpened] = useState(false);
+
+  if (handleSelectedRecordingId) {
+    useEffect(() => {
+      handleSelectedRecordingId(selectedRecordingId);
+    }, [selectedRecordingId, handleSelectedRecordingId]);
+  }
+
+  if (handleListState) {
+    useEffect(() => {
+      handleListState(listOpened);
+    }, [listOpened, handleListState]);
+  }
+
+  useEffect(() => {
+    if (!listOpened) {
+      setSelectedRecordingId("");
+    }
+  }, [listOpened]);
+
+  return (
+    <div
+      className={cn(
+        "flex flex-col bg-foreground rounded-md gap-2 px-3 sm:px-5 py-3 sm:py-4 transition-[flex-grow] duration-300",
+        listOpened && selectedRecordingId && "flex-grow",
+      )}
+    >
+      <Accordion
+        type="single"
+        collapsible
+        className="text-white w-full"
+        onValueChange={(item) => setListOpened(item === "recordings")}
+      >
+        <AccordionItem value="recordings" className="border-b-0">
+          <AccordionTrigger className="p-0">展開會議紀錄</AccordionTrigger>
+          <AccordionContent className="p-0" />
+          <RadioGroup
+            value={selectedRecordingId}
+            onValueChange={(recordingId) => setSelectedRecordingId(recordingId)}
+          >
+            {recordings.map((meeting, index) => (
+              <AccordionContent
+                key={meeting.id}
+                className={cn("p-0", index === 0 ? "mt-4" : "pt-0")}
+              >
+                <RadioGroupItem
+                  value={meeting.id}
+                  id={meeting.id}
+                  className="hidden"
+                />
+                <Label
+                  htmlFor={meeting.id}
+                  className={cn(
+                    "flex items-center justify-between gap-4 hover:bg-[#383838] transition-colors duration-200 cursor-pointer px-2 pb-1.5 rounded-lg",
+                    selectedRecordingId === meeting.id && "bg-[#383838]",
+                  )}
+                >
+                  <div>
+                    <p className="flex items-center text-xs text-muted-foreground">
+                      {
+                        readableTime.formatElapsedTime(meeting.durationMs)
+                          .string
+                      }
+                      <DotIcon className="-mx-1.5" />
+                      {new Date(meeting.createdAt).toLocaleDateString()}
+                    </p>
+                    <p className="text-base sm:text-lg">{meeting.title}</p>
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger className="-mb-1.5 px-1.5 aspect-square rounded-xl hover:bg-foreground transition-colors duration-200">
+                      <EllipsisIcon />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="bg-[#383838] border-none text-white">
+                      <DropdownMenuItem className="cursor-pointer">
+                        Delete
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="cursor-pointer">
+                        Rename
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </Label>
+              </AccordionContent>
+            ))}
+          </RadioGroup>
+        </AccordionItem>
+      </Accordion>
+    </div>
   );
 }
 
