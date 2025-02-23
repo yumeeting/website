@@ -20,13 +20,11 @@ import {
 export function AudioPlayer({ audioSourcePath }: { audioSourcePath: string }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
+  const [preloadedTime, setPreloadedTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(0.5);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-
-  if (audioRef?.current) {
-    audioRef.current.volume = volume;
-  }
+  const fadeIntervalRef = useRef<number | null>(null);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -37,6 +35,7 @@ export function AudioPlayer({ audioSourcePath }: { audioSourcePath: string }) {
       audio.addEventListener("timeupdate", () =>
         setCurrentTime(audio.currentTime),
       );
+      audio.addEventListener("progress", handleProgress);
     }
     return () => {
       if (audio) {
@@ -46,6 +45,10 @@ export function AudioPlayer({ audioSourcePath }: { audioSourcePath: string }) {
         audio.removeEventListener("timeupdate", () =>
           setCurrentTime(audio.currentTime),
         );
+        audio.removeEventListener("progress", handleProgress);
+      }
+      if (fadeIntervalRef.current) {
+        clearInterval(fadeIntervalRef.current);
       }
     };
   }, []);
@@ -75,6 +78,7 @@ export function AudioPlayer({ audioSourcePath }: { audioSourcePath: string }) {
           step={1}
           onValueChange={handleSeek}
           className="flex-grow"
+          preloadValue={preloadedTime / duration}
         />
         <span className="text-sm -mt-[2px]">{formatTime(duration)}</span>
       </div>
@@ -125,11 +129,51 @@ export function AudioPlayer({ audioSourcePath }: { audioSourcePath: string }) {
   function togglePlayPause() {
     if (audioRef.current) {
       if (isPlaying) {
-        audioRef.current.pause();
+        fadeAudio(false); // Fade out
       } else {
         audioRef.current.play();
+        fadeAudio(true); // Fade in
       }
       setIsPlaying(!isPlaying);
+    }
+
+    function fadeAudio(fadeIn: boolean) {
+      if (fadeIntervalRef.current) {
+        clearInterval(fadeIntervalRef.current);
+      }
+
+      const audio = audioRef.current;
+      if (!audio) {
+        return;
+      }
+
+      const fadeStep = 0.02;
+      const fadeInterval = 3; // ms
+
+      if (fadeIn) {
+        audio.volume = 0;
+      }
+
+      fadeIntervalRef.current = window.setInterval(() => {
+        if (fadeIn) {
+          if (audio.volume < volume) {
+            audio.volume = Math.min(audio.volume + fadeStep, volume);
+          } else {
+            if (fadeIntervalRef.current !== null) {
+              clearInterval(fadeIntervalRef.current);
+            }
+          }
+        } else {
+          if (audio.volume > 0) {
+            audio.volume = Math.max(audio.volume - fadeStep, 0);
+          } else {
+            if (fadeIntervalRef.current !== null) {
+              clearInterval(fadeIntervalRef.current);
+            }
+            audio.pause();
+          }
+        }
+      }, fadeInterval);
     }
   }
 
@@ -145,6 +189,14 @@ export function AudioPlayer({ audioSourcePath }: { audioSourcePath: string }) {
     setVolume(newVolume);
     if (audioRef?.current) {
       audioRef.current.volume = newVolume;
+    }
+  }
+
+  function handleProgress() {
+    if (audioRef.current && audioRef.current.buffered.length > 0) {
+      setPreloadedTime(
+        audioRef.current.buffered.end(audioRef.current.buffered.length - 1),
+      );
     }
   }
 }
