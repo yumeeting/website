@@ -1,7 +1,14 @@
 "use client";
 
 import { useUser } from "@auth0/nextjs-auth0";
-import { DotIcon, EllipsisIcon, MicIcon, UploadIcon } from "lucide-react";
+import {
+  DotIcon,
+  EllipsisIcon,
+  MicIcon,
+  PenLineIcon,
+  TrashIcon,
+  UploadIcon,
+} from "lucide-react";
 import { motion } from "motion/react";
 import { permanentRedirect } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
@@ -42,11 +49,13 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { readableTime } from "@/modules/readableTime";
 import { User } from "@auth0/nextjs-auth0/types";
+import { AudioPlayer } from "@/components/AudioPlayer";
 
-type Recordings = {
+type Recording = {
   id: string;
   title: string;
   durationMs: number;
+  audioSourcePath: string;
   createdAt: number;
 };
 
@@ -56,23 +65,26 @@ export default function Dashboard() {
   const [recordingsModeSelection, setRecordingsModeSelection] = useState(0);
   const [isPro, setIsPro] = useState(false);
   const [selectedRecordingId, setSelectedRecordingId] = useState<string>("");
-  const [recordings, setRecordings] = useState<Recordings[]>([
+  const [recordings, setRecordings] = useState<Recording[]>([
     {
       id: "1",
       title: "關於多語言海報設計的反饋與建議",
       durationMs: Math.floor(Math.random() * (600000 - 10000 + 1)) + 10000,
+      audioSourcePath: "audios/test-audio-0.m4a",
       createdAt: Date.now(),
     },
     {
       id: "2",
       title: "增強品牌與產品案例展示及其他項目討論",
       durationMs: Math.floor(Math.random() * (600000 - 10000 + 1)) + 10000,
+      audioSourcePath: "audios/test-audio-1.m4a",
       createdAt: Date.now() - Math.floor(Math.random() * 11) * 86400000,
     },
     {
       id: "3",
       title: "顧客與店員關於商品維修的詳細對話",
       durationMs: Math.floor(Math.random() * (600000 - 10000 + 1)) + 10000,
+      audioSourcePath: "audios/test-audio-0.m4a",
       createdAt: Date.now() - Math.floor(Math.random() * 11) * 86400000,
     },
   ]);
@@ -199,14 +211,14 @@ function RecordingContent({
   recordings,
   selectedRecordingId,
 }: {
-  recordings: Recordings[];
+  recordings: Recording[];
   selectedRecordingId: string;
 }) {
   return (
     <>
       <div
         className={cn(
-          "h-full max-w-7xl flex items-center justify-center bg-white rounded-lg transition-[width,height,margin] duration-300 overflow-hidden",
+          "h-full max-w-7xl bg-white rounded-lg transition-[width,height,margin] duration-300 overflow-hidden",
           !selectedRecordingId && "w-0 h-0 mt-60",
           selectedRecordingId && "w-full h-full",
         )}
@@ -219,18 +231,38 @@ function RecordingContent({
               x: "0%",
             },
             closed: {
-              opacity: 1,
+              opacity: 0,
               x: "-100%",
             },
           }}
+          className="w-full h-full px-5 py-5"
         >
-          {selectedRecordingId &&
-            recordings.find((recording) => recording.id === selectedRecordingId)
-              ?.title}
+          <Content selectedRecordingId={selectedRecordingId} />
         </motion.div>
       </div>
     </>
   );
+
+  function Content({
+    selectedRecordingId,
+  }: {
+    selectedRecordingId: string;
+  }) {
+    const selectedRecording = recordings.find(
+      (recording) => recording.id === selectedRecordingId,
+    );
+
+    if (!selectedRecording) {
+      return <h1>請選擇一個會議記錄</h1>;
+    }
+
+    return (
+      <>
+        <h1 className="text-3xl font-semibold">{selectedRecording.title}</h1>
+        <AudioPlayer audioSourcePath={selectedRecording.audioSourcePath} />
+      </>
+    );
+  }
 }
 
 function RecordingsList({
@@ -239,8 +271,8 @@ function RecordingsList({
   handleListState,
   handleSelectedRecordingId,
 }: {
-  recordings: Recordings[];
-  setRecordings: Dispatch<SetStateAction<Recordings[]>>;
+  recordings: Recording[];
+  setRecordings: Dispatch<SetStateAction<Recording[]>>;
   handleListState?: (listOpened: boolean) => void;
   handleSelectedRecordingId?: (recordingId: string) => void;
 }) {
@@ -318,11 +350,13 @@ function RecordingsList({
                       <EllipsisIcon />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="bg-[#383838] border border-primary text-white">
-                      <DropdownMenuItem className="cursor-pointer hover:!bg-primary/70">
-                        Delete
+                      <DropdownMenuItem className="cursor-pointer hover:!bg-primary/70 hover:!text-primary-foreground">
+                        <TrashIcon />
+                        刪除
                       </DropdownMenuItem>
-                      <DropdownMenuItem className="cursor-pointer hover:!bg-primary/70">
-                        Rename
+                      <DropdownMenuItem className="cursor-pointer hover:!bg-primary/70 hover:!text-primary-foreground">
+                        <PenLineIcon />
+                        重命名
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
