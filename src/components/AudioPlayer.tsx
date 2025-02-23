@@ -1,13 +1,5 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   PlayIcon,
   PauseIcon,
@@ -16,6 +8,15 @@ import {
   Volume1Icon,
   VolumeIcon,
 } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+
+import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function AudioPlayer({ audioSourcePath }: { audioSourcePath: string }) {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -36,6 +37,7 @@ export function AudioPlayer({ audioSourcePath }: { audioSourcePath: string }) {
         setCurrentTime(audio.currentTime),
       );
       audio.addEventListener("progress", handleProgress);
+      audio.addEventListener("ended", handleEnded);
     }
     return () => {
       if (audio) {
@@ -46,6 +48,7 @@ export function AudioPlayer({ audioSourcePath }: { audioSourcePath: string }) {
           setCurrentTime(audio.currentTime),
         );
         audio.removeEventListener("progress", handleProgress);
+        audio.removeEventListener("ended", handleEnded);
       }
       if (fadeIntervalRef.current) {
         clearInterval(fadeIntervalRef.current);
@@ -61,7 +64,7 @@ export function AudioPlayer({ audioSourcePath }: { audioSourcePath: string }) {
       <Button
         variant="ghost"
         size="icon"
-        className="rounded-full"
+        className="h-7 w-auto aspect-square rounded-full"
         onClick={togglePlayPause}
       >
         {isPlaying ? (
@@ -84,7 +87,11 @@ export function AudioPlayer({ audioSourcePath }: { audioSourcePath: string }) {
       </div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="rounded-full">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-auto aspect-square rounded-full"
+          >
             <ResponsiveVolumeIcon volume={volume} />
           </Button>
         </DropdownMenuTrigger>
@@ -126,11 +133,18 @@ export function AudioPlayer({ audioSourcePath }: { audioSourcePath: string }) {
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   }
 
+  function handleEnded() {
+    setIsPlaying(false);
+  }
+
   function togglePlayPause() {
     if (audioRef.current) {
       if (isPlaying) {
         fadeAudio(false); // Fade out
       } else {
+        if (audioRef.current.ended) {
+          audioRef.current.currentTime = 0;
+        }
         audioRef.current.play();
         fadeAudio(true); // Fade in
       }
