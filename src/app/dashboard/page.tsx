@@ -1,29 +1,21 @@
 "use client";
 
-import { MicIcon, UploadIcon, DotIcon, EllipsisIcon } from "lucide-react";
-import { permanentRedirect } from "next/navigation";
 import { useUser } from "@auth0/nextjs-auth0";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { DotIcon, EllipsisIcon, MicIcon, UploadIcon } from "lucide-react";
 import { motion } from "motion/react";
+import { permanentRedirect } from "next/navigation";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Spinner } from "@/components/Spinner";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
 import Icons from "@/components/Icons";
-import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/Spinner";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -37,11 +29,19 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { readableTime } from "@/modules/readableTime";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { User } from "@auth0/nextjs-auth0/types";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import { readableTime } from "@/modules/readableTime";
+import { User } from "@auth0/nextjs-auth0/types";
 
 type Recordings = {
   id: string;
@@ -152,18 +152,15 @@ function RecordPanel({
       </div>
       <div className="flex sm:flex-row flex-col gap-3 mt-4 w-full">
         <div className="flex-grow flex gap-3 h-12">
-          <button
-            type="button"
-            className="flex-grow flex items-center justify-center h-full rounded-full text-background bg-foreground hover:bg-stone-700 transition-colors duration-300"
+          <Button className="flex-grow h-full rounded-full p-0">
+            <MicIcon className="!h-6 !w-auto" />
+          </Button>
+          <Button
+            variant="border"
+            className="aspect-square w-auto h-full rounded-full p-0"
           >
-            <MicIcon />
-          </button>
-          <button
-            type="button"
-            className="flex items-center justify-center aspect-square h-full rounded-full border border-foreground hover:bg-stone-200 transition-colors duration-300"
-          >
-            <UploadIcon className="h-5 w-auto" />
-          </button>
+            <UploadIcon className="!h-5 !w-auto" />
+          </Button>
         </div>
         <Select>
           <SelectTrigger className="sm:w-52 w-full h-12 bg-stone-100">
@@ -271,7 +268,7 @@ function RecordingsList({
   return (
     <div
       className={cn(
-        "flex flex-col bg-foreground rounded-md gap-2 px-3 sm:px-5 py-3 sm:py-4 transition-[flex-grow] duration-300",
+        "flex flex-col bg-primary rounded-md gap-2 px-3 sm:px-5 py-3 sm:py-4 transition-[flex-grow] duration-300",
         listOpened && selectedRecordingId && "flex-grow",
       )}
     >
@@ -317,14 +314,14 @@ function RecordingsList({
                     <p className="text-base sm:text-lg">{meeting.title}</p>
                   </div>
                   <DropdownMenu>
-                    <DropdownMenuTrigger className="-mb-1.5 px-1.5 aspect-square rounded-xl hover:bg-foreground transition-colors duration-200">
+                    <DropdownMenuTrigger className="-mb-1.5 px-1.5 aspect-square rounded-xl hover:bg-primary transition-colors duration-200">
                       <EllipsisIcon />
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent className="bg-[#383838] border border-foreground text-white">
-                      <DropdownMenuItem className="cursor-pointer">
+                    <DropdownMenuContent className="bg-[#383838] border border-primary text-white">
+                      <DropdownMenuItem className="cursor-pointer hover:!bg-primary/70">
                         Delete
                       </DropdownMenuItem>
-                      <DropdownMenuItem className="cursor-pointer">
+                      <DropdownMenuItem className="cursor-pointer hover:!bg-primary/70">
                         Rename
                       </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -351,7 +348,7 @@ function Settings({
   return (
     <Dialog>
       <DialogTrigger className="fixed top-0 right-0 flex items-center gap-2 rounded-bl-3xl border-none bg-white px-3 py-2">
-        <Avatar className="border border-foreground h-8 w-auto aspect-square">
+        <Avatar className="border border-primary h-8 w-auto aspect-square">
           <AvatarImage src={user.picture} />
           <AvatarFallback
             className={
@@ -372,7 +369,7 @@ function Settings({
       <DialogContent className="bg-black border-none text-white !rounded-2xl px-4 sm:px-6 py-4 sm:py-5">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
-            <Avatar className="border border-foreground h-12 w-auto aspect-square">
+            <Avatar className="border border-primary h-12 w-auto aspect-square">
               <AvatarImage src={user.picture} />
               <AvatarFallback
                 className={cn(
@@ -393,7 +390,7 @@ function Settings({
             </div>
           </DialogTitle>
         </DialogHeader>
-        <div className="bg-foreground rounded-2xl px-3 sm:px-5 py-3 sm:py-4">
+        <div className="bg-primary rounded-2xl px-3 sm:px-5 py-3 sm:py-4">
           <p>當前：{isPro ? "高級方案" : "免費方案"}</p>
           <div className="flex items-center justify-between mt-3 mx-2">
             <p className="flex items-center gap-2">
