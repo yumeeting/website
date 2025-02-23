@@ -1,6 +1,6 @@
+import { Auth0Provider } from "@auth0/nextjs-auth0";
 import type { Metadata } from "next";
 import { Inter, Noto_Sans_TC, Noto_Serif_SC, Outfit } from "next/font/google";
-import { Auth0Provider } from "@auth0/nextjs-auth0";
 
 import "./globals.css";
 

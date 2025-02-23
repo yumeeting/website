@@ -1,7 +1,7 @@
 import Image from "next/image";
 
-import { auth0 } from "@/lib/auth0";
 import { Underline } from "@/components/Underline";
+import { auth0 } from "@/lib/auth0";
 
 export default async function Login() {
   const session = await auth0.getSession();
