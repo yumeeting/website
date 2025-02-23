@@ -11,9 +11,19 @@ import {
 } from "lucide-react";
 import { motion } from "motion/react";
 import { permanentRedirect } from "next/navigation";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import {
+  createRef,
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useState,
+} from "react";
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 
-import Icons from "@/components/Icons";
+import { Icons } from "@/components/Icons";
 import { Spinner } from "@/components/Spinner";
 import {
   Accordion,
@@ -56,6 +66,7 @@ type Recording = {
   title: string;
   durationMs: number;
   audioSourcePath: string;
+  notes: string;
   createdAt: number;
 };
 
@@ -71,6 +82,15 @@ export default function Dashboard() {
       title: "關於多語言海報設計的反饋與建議",
       durationMs: Math.floor(Math.random() * (600000 - 10000 + 1)) + 10000,
       audioSourcePath: "audios/test-audio-0.m4a",
+      notes: `
+Here is some JavaScript code:
+
+~~~js
+console.log('It works!')
+~~~
+
+Just a link: www.nasa.gov.
+`.trim(),
       createdAt: Date.now(),
     },
     {
@@ -78,6 +98,10 @@ export default function Dashboard() {
       title: "增強品牌與產品案例展示及其他項目討論",
       durationMs: Math.floor(Math.random() * (600000 - 10000 + 1)) + 10000,
       audioSourcePath: "audios/test-audio-1.m4a",
+      notes: `
+# Hi, *Pluto*!
+[OnCloud Blog](https://on-cloud.tw)
+`.trim(),
       createdAt: Date.now() - Math.floor(Math.random() * 11) * 86400000,
     },
     {
@@ -85,6 +109,20 @@ export default function Dashboard() {
       title: "顧客與店員關於商品維修的詳細對話",
       durationMs: Math.floor(Math.random() * (600000 - 10000 + 1)) + 10000,
       audioSourcePath: "audios/test-audio-0.m4a",
+      notes: `
+A paragraph with *emphasis* and **strong importance**.
+
+> A block quote with ~strikethrough~ and a URL: https://reactjs.org.
+
+* Lists
+* [ ] todo
+* [x] done
+
+A table:
+
+| a | b |
+| - | - |
+`.trim(),
       createdAt: Date.now() - Math.floor(Math.random() * 11) * 86400000,
     },
   ]);
@@ -235,7 +273,7 @@ function RecordingContent({
               x: "-100%",
             },
           }}
-          className="w-full h-full px-5 py-5"
+          className="w-full h-full p-7"
         >
           <Content selectedRecordingId={selectedRecordingId} />
         </motion.div>
@@ -248,6 +286,8 @@ function RecordingContent({
   }: {
     selectedRecordingId: string;
   }) {
+    const syntaxHighlighterRef = createRef<SyntaxHighlighter>();
+
     const selectedRecording = recordings.find(
       (recording) => recording.id === selectedRecordingId,
     );
@@ -259,7 +299,47 @@ function RecordingContent({
     return (
       <>
         <h1 className="text-3xl font-semibold">{selectedRecording.title}</h1>
-        <AudioPlayer audioSourcePath={selectedRecording.audioSourcePath} />
+        <div className="mt-5 flex gap-3 xl:gap-6 flex-col xl:flex-row justify-between">
+          <AudioPlayer
+            audioSourcePath={selectedRecording.audioSourcePath}
+            className="max-w-sm w-full"
+          />
+          <div className="flex gap-3">
+            <Button className="rounded-full">下載錄音</Button>
+            <Button className="rounded-full">下載會議整理</Button>
+            <Button variant="border" className="rounded-full">
+              查看逐字稿
+            </Button>
+          </div>
+        </div>
+        <div className="mt-7 [&_a]:text-blue-500 prose">
+          <Markdown
+            components={{
+              code(props) {
+                const { children, className, node, ...rest } = props;
+                const match = /language-(\w+)/.exec(className || "");
+                return match ? (
+                  <SyntaxHighlighter
+                    {...rest}
+                    PreTag="div"
+                    language={match[1]}
+                    style={oneDark}
+                    ref={syntaxHighlighterRef}
+                  >
+                    {String(children).replace(/\n$/, "")}
+                  </SyntaxHighlighter>
+                ) : (
+                  <code {...rest} className={className}>
+                    {children}
+                  </code>
+                );
+              },
+            }}
+            remarkPlugins={[remarkGfm]}
+          >
+            {selectedRecording.notes}
+          </Markdown>
+        </div>
       </>
     );
   }

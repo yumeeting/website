@@ -17,8 +17,12 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 
-export function AudioPlayer({ audioSourcePath }: { audioSourcePath: string }) {
+export const AudioPlayer: React.FC<{
+  audioSourcePath: string;
+  className?: string;
+}> = ({ audioSourcePath, className }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [preloadedTime, setPreloadedTime] = useState(0);
@@ -57,7 +61,12 @@ export function AudioPlayer({ audioSourcePath }: { audioSourcePath: string }) {
   }, []);
 
   return (
-    <div className="flex items-center gap-1 bg-background p-1 rounded-full shadow-md max-w-md">
+    <div
+      className={cn(
+        "flex items-center gap-1 bg-background p-1 rounded-full shadow-md max-w-md",
+        className,
+      )}
+    >
       <audio ref={audioRef} src={audioSourcePath}>
         <track kind="captions" />
       </audio>
@@ -213,4 +222,4 @@ export function AudioPlayer({ audioSourcePath }: { audioSourcePath: string }) {
       );
     }
   }
-}
+};

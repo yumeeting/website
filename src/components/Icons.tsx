@@ -20,12 +20,12 @@ const iconData: Record<string, { src: string; alt: string; isSvg: boolean }> = {
   },
 };
 
-interface IconsProps {
+type IconsProps = {
   type: "discord" | "google-meet" | "yu-credit-dark" | "yu-credit-light";
   className?: string;
-}
+};
 
-const Icons: React.FC<IconsProps> = ({ type, className }) => {
+export const Icons: React.FC<IconsProps> = ({ type, className }) => {
   const icon = iconData[type];
 
   if (!icon) {
@@ -46,5 +46,3 @@ const Icons: React.FC<IconsProps> = ({ type, className }) => {
     />
   );
 };
-
-export default Icons;
