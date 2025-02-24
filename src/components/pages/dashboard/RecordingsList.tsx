@@ -71,33 +71,35 @@ export function RecordingsList({
             value={selectedRecordingId}
             onValueChange={(recordingId) => setSelectedRecordingId(recordingId)}
           >
-            {recordings.map((meeting, index) => (
+            {recordings.map((recording, index) => (
               <AccordionContent
-                key={meeting.id}
+                key={recording.id}
                 className={cn("p-0", index === 0 ? "mt-4" : "pt-0")}
               >
                 <RadioGroupItem
-                  value={meeting.id}
-                  id={meeting.id}
+                  value={recording.id}
+                  id={recording.id}
                   className="hidden"
                 />
                 <Label
-                  htmlFor={meeting.id}
+                  htmlFor={recording.id}
                   className={cn(
                     "flex items-center justify-between gap-4 hover:bg-[#383838] transition-colors duration-200 cursor-pointer px-2 pb-1.5 rounded-lg",
-                    selectedRecordingId === meeting.id && "bg-[#383838]",
+                    selectedRecordingId === recording.id && "bg-[#383838]",
                   )}
                 >
-                  <div>
+                  <div className="flex-grow min-w-0">
                     <p className="flex items-center text-xs text-muted-foreground">
                       {
-                        readableTime.formatElapsedTime(meeting.durationMs)
+                        readableTime.formatElapsedTime(recording.durationMs)
                           .string
                       }
-                      <DotIcon className="-mx-1.5" />
-                      {new Date(meeting.createdAt).toLocaleDateString()}
+                      <DotIcon className="-mx-1.5 translate-y-[1px]" />
+                      {new Date(recording.createdAt).toLocaleDateString()}
                     </p>
-                    <p className="text-base sm:text-lg">{meeting.title}</p>
+                    <p className="text-base sm:text-lg text-ellipsis overflow-hidden whitespace-nowrap">
+                      {recording.title}
+                    </p>
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger className="-mb-1.5 px-1.5 aspect-square rounded-xl hover:bg-primary transition-colors duration-200">
