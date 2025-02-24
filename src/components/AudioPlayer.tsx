@@ -63,7 +63,7 @@ export const AudioPlayer: React.FC<{
   return (
     <div
       className={cn(
-        "flex items-center gap-1 bg-background p-1 rounded-full shadow-md max-w-md",
+        "flex items-center gap-1 bg-background p-1 rounded-full max-w-md",
         className,
       )}
     >
