@@ -4,5 +4,10 @@ export type Recording = {
   durationMs: number;
   audioSourcePath: string;
   notes: string;
+  transcripts: {
+    userName: string;
+    text: string;
+    startTime: number; // ms
+  }[];
   createdAt: number;
 };
