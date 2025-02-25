@@ -1,6 +1,6 @@
-import { MicIcon, UploadIcon } from "lucide-react";
+import { MicIcon, PauseIcon, UploadIcon } from "lucide-react";
 import { Dispatch, SetStateAction, useState } from "react";
-import { AudioVisualizer } from "react-audio-visualize";
+import { Visualizer } from "react-sound-visualizer";
 
 import { Icons } from "@/components/Icons";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,7 @@ export function RecordPanel({
   setRecordingsModeSelection: Dispatch<SetStateAction<number>>;
 }) {
   const [isRecording, setIsRecording] = useState(false);
+  const [audio, setAudio] = useState<MediaStream | null>(null);
 
   const recordingsModesOption = [
     "一般會議記錄",
@@ -53,10 +54,33 @@ export function RecordPanel({
           className={cn("flex-grow flex gap-3 h-12", isRecording && "gap-0")}
         >
           <Button
-            className="flex-grow h-full rounded-full p-0"
-            onClick={() => setIsRecording((prev) => !prev)}
+            className={cn(
+              "group flex-grow h-full rounded-full p-0 overflow-hidden !transition-[box-shadow,background-color] !duration-200",
+              isRecording && "bg-transparent hover:bg-stone-100 shadow-none",
+            )}
+            onClick={() => {
+              setIsRecording((prev) => !prev);
+              if (!isRecording) {
+                startRecording();
+              } else {
+                stopRecording();
+              }
+            }}
           >
-            <MicIcon className="!h-6 !w-auto" />
+            {isRecording ? (
+              <Visualizer audio={audio} autoStart strokeColor="#076AFF">
+                {({ canvasRef }) => (
+                  <>
+                    <canvas ref={canvasRef} className="w-full h-full" />
+                    <div className="absolute w-full h-full rounded-full overflow-hidden text-primary opacity-0 group-hover:opacity-100 flex items-center justify-center !transition-[opacity] !duration-200 backdrop-blur-sm">
+                      <PauseIcon className="!h-6 !w-auto" />
+                    </div>
+                  </>
+                )}
+              </Visualizer>
+            ) : (
+              <MicIcon className="!h-6 !w-auto" />
+            )}
           </Button>
           <Button
             variant="border"
@@ -104,4 +128,21 @@ export function RecordPanel({
       </Button>
     </div>
   );
+
+  function startRecording() {
+    navigator.mediaDevices
+      .getUserMedia({
+        audio: true,
+        video: false,
+      })
+      .then(setAudio);
+  }
+
+  function stopRecording() {
+    if (audio) {
+      for (const track of audio.getTracks()) {
+        track.stop();
+      }
+    }
+  }
 }
