@@ -1,4 +1,4 @@
-export type Recording = {
+export type Record = {
   id: string;
   title: string;
   durationMs: number;

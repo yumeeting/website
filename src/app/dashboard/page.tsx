@@ -8,9 +8,9 @@ import { Spinner } from "@/components/Spinner";
 import { cn } from "@/lib/utils";
 import { RecordPanel } from "@/components/pages/dashboard/RecordPanel";
 import { Settings } from "@/components/pages/dashboard/Settings";
-import { Recording } from "@/components/pages/dashboard/types/Recording";
-import { RecordingsList } from "@/components/pages/dashboard/RecordingsList";
-import { RecordingContent } from "@/components/pages/dashboard/RecordingContent";
+import { Record } from "@/components/pages/dashboard/types/Record";
+import { RecordsList } from "@/components/pages/dashboard/RecordsList";
+import { RecordContent } from "@/components/pages/dashboard/RecordContent";
 
 export default function Dashboard() {
   const { user, isLoading: isAuth0Loading } = useUser();
@@ -18,7 +18,7 @@ export default function Dashboard() {
   const [recordingsModeSelection, setRecordingsModeSelection] = useState(0);
   const [isPro, setIsPro] = useState(false);
   const [selectedRecordingId, setSelectedRecordingId] = useState<string>("");
-  const [recordings, setRecordings] = useState<Recording[]>([
+  const [recordings, setRecordings] = useState<Record[]>([
     {
       id: "1",
       title: "YU Meeting 開發進度更新：轉錄、摘要與自動化",
@@ -306,7 +306,7 @@ export default function Dashboard() {
               recordingsModeSelection={recordingsModeSelection}
               setRecordingsModeSelection={setRecordingsModeSelection}
             />
-            <RecordingsList
+            <RecordsList
               recordings={recordings}
               setRecordings={setRecordings}
               handleSelectedRecordingId={(selectedRecordingId) => {
@@ -314,9 +314,9 @@ export default function Dashboard() {
               }}
             />
           </div>
-          <RecordingContent
-            recordings={recordings}
-            selectedRecordingId={selectedRecordingId}
+          <RecordContent
+            record={recordings}
+            selectedRecordId={selectedRecordingId}
           />
         </div>
         <div className="h-2 sm:h-0" />

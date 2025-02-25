@@ -17,16 +17,16 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
 import { readableTime } from "@/modules/readableTime";
-import { Recording } from "./types/Recording";
+import { Record } from "./types/Record";
 
-export function RecordingsList({
+export function RecordsList({
   recordings,
   setRecordings: _setRecordings,
   handleListState,
   handleSelectedRecordingId,
 }: {
-  recordings: Recording[];
-  setRecordings: Dispatch<SetStateAction<Recording[]>>;
+  recordings: Record[];
+  setRecordings: Dispatch<SetStateAction<Record[]>>;
   handleListState?: (listOpened: boolean) => void;
   handleSelectedRecordingId?: (recordingId: string) => void;
 }) {

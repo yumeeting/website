@@ -1,5 +1,6 @@
 import { MicIcon, UploadIcon } from "lucide-react";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
+import { AudioVisualizer } from "react-audio-visualize";
 
 import { Icons } from "@/components/Icons";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 
 export function RecordPanel({
   recordingsModeSelection,
@@ -19,6 +21,8 @@ export function RecordPanel({
   recordingsModeSelection: number;
   setRecordingsModeSelection: Dispatch<SetStateAction<number>>;
 }) {
+  const [isRecording, setIsRecording] = useState(false);
+
   const recordingsModesOption = [
     "一般會議記錄",
     "一般會議記錄（非常詳細）",
@@ -39,20 +43,38 @@ export function RecordPanel({
           {"."}
         </p>
       </div>
-      <div className="flex sm:flex-row flex-col gap-3 mt-4 w-full">
-        <div className="flex-grow flex gap-3 h-12">
-          <Button className="flex-grow h-full rounded-full p-0">
+      <div
+        className={cn(
+          "relative flex sm:flex-row flex-col gap-3 mt-4 w-full transition-[gap] duration-300 [&_*]:transition-[width,gap,padding,border] [&_*]:duration-300",
+          isRecording && "gap-0",
+        )}
+      >
+        <div
+          className={cn("flex-grow flex gap-3 h-12", isRecording && "gap-0")}
+        >
+          <Button
+            className="flex-grow h-full rounded-full p-0"
+            onClick={() => setIsRecording((prev) => !prev)}
+          >
             <MicIcon className="!h-6 !w-auto" />
           </Button>
           <Button
             variant="border"
-            className="aspect-square w-auto h-full rounded-full p-0"
+            className={cn(
+              "aspect-square w-12 h-auto rounded-full p-0 overflow-hidden",
+              isRecording && "w-0 border-opacity-0 border-0",
+            )}
           >
             <UploadIcon className="!h-5 !w-auto" />
           </Button>
         </div>
         <Select>
-          <SelectTrigger className="sm:w-52 w-full h-12 bg-stone-100">
+          <SelectTrigger
+            className={cn(
+              "w-52 h-12 bg-stone-100 overflow-hidden",
+              isRecording && "w-0 p-0 border-opacity-0 border-0",
+            )}
+          >
             <div>
               <p className="text-xs text-left text-stone-500">模式</p>
               <SelectValue

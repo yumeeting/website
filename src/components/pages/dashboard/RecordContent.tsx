@@ -8,32 +8,29 @@ import { DotIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { AudioPlayer } from "@/components/AudioPlayer";
-import { Recording } from "@/components/pages/dashboard/types/Recording";
+import { Record } from "@/components/pages/dashboard/types/Record";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { readableTime } from "@/modules/readableTime";
 
-export function RecordingContent({
-  recordings,
-  selectedRecordingId,
+export function RecordContent({
+  record,
+  selectedRecordId,
 }: {
-  recordings: Recording[];
-  selectedRecordingId: string;
+  record: Record[];
+  selectedRecordId: string;
 }) {
   return (
     <>
       <div
         className={cn(
           "h-full max-w-7xl bg-white rounded-lg transition-[width,height,margin] duration-300 overflow-hidden",
-          !selectedRecordingId && "w-0 h-0 mt-60",
-          selectedRecordingId && "w-full h-full",
+          !selectedRecordId && "w-0 h-0 mt-60",
+          selectedRecordId && "w-full h-full",
         )}
       >
         <div className="flex flex-col gap-5 w-full h-full p-7">
-          <Content
-            selectedRecordingId={selectedRecordingId}
-            recordings={recordings}
-          />
+          <Content selectedRecordId={selectedRecordId} records={record} />
         </div>
       </div>
     </>
@@ -41,43 +38,41 @@ export function RecordingContent({
 }
 
 function Content({
-  selectedRecordingId,
-  recordings,
+  selectedRecordId: selectedRecordingId,
+  records,
 }: {
-  selectedRecordingId: string;
-  recordings: Recording[];
+  selectedRecordId: string;
+  records: Record[];
 }) {
   const [selectedContentType, setSelectedContentType] = useState<
     "notes" | "transcript"
-  >("transcript");
+  >("notes");
   const syntaxHighlighterRef = createRef<SyntaxHighlighter>();
 
-  const selectedRecording = recordings.find(
+  const selectedRecord = records.find(
     (recording) => recording.id === selectedRecordingId,
   );
 
-  if (!selectedRecording) {
+  if (!selectedRecord) {
     return <h1>請選擇一個會議記錄</h1>;
   }
 
   return (
     <>
       <div>
-        <h1 className="text-3xl font-semibold">{selectedRecording.title}</h1>
+        <h1 className="text-3xl font-semibold">{selectedRecord.title}</h1>
         <p className="mt-2 flex items-center text-xs text-muted-foreground">
-          {readableTime.formatElapsedTime(selectedRecording.durationMs).string}
+          {readableTime.formatElapsedTime(selectedRecord.durationMs).string}
           <DotIcon className="-mx-1.5 translate-y-[1px]" />
-          {new Date(selectedRecording.createdAt).toLocaleDateString()}
+          {new Date(selectedRecord.createdAt).toLocaleDateString()}
         </p>
       </div>
       <div className="flex gap-3 xl:gap-6 flex-col xl:flex-row justify-between">
         <AudioPlayer
-          audioSourcePath={selectedRecording.audioSourcePath}
+          audioSourcePath={selectedRecord.audioSourcePath}
           className="max-w-sm w-full"
         />
         <div className="flex gap-3">
-          <Button className="rounded-full">下載錄音</Button>
-          <Button className="rounded-full">下載會議整理</Button>
           <div className="p-1 flex gap-1 bg-background rounded-full">
             <Button
               variant="ghost"
@@ -100,6 +95,8 @@ function Content({
               逐字稿
             </Button>
           </div>
+          <Button className="rounded-full">下載錄音</Button>
+          <Button className="rounded-full">下載會議整理</Button>
         </div>
       </div>
       <Separator />
@@ -148,7 +145,7 @@ function Content({
             }}
             remarkPlugins={[remarkGfm]}
           >
-            {selectedRecording.notes}
+            {selectedRecord.notes}
           </Markdown>
         </motion.div>
         <motion.div
@@ -172,7 +169,7 @@ function Content({
           className="absolute top-0 left-0 bottom-0 right-1.5"
         >
           <div className="flex flex-col gap-3">
-            {selectedRecording.transcripts.map((transcript, index) => (
+            {selectedRecord.transcripts.map((transcript, index) => (
               <div key={index} className="px-4 py-4 bg-stone-100 rounded-lg">
                 <p className="text-sm flex items-center">
                   <span className="font-semibold">{transcript.userName}</span>
